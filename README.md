@@ -1,103 +1,53 @@
 <br/>
 <p align="center">
-  <h3 align="center">Ecommerce Tailwind Template</h3>
+  <h3 align="center">Ecommerce Backend</h3>
 
   <p align="center">
-    an ecommerce template using tailwind css v3
+    Backend para un ecommerce utilizando como base una plantilla de Tailwind CSS.
     <br/>
     <br/>
   </p>
 </p>
 
+## Acerca del Proyecto
 
+Este proyecto corresponde al backend de un ecommerce, creado tomando como base la plantilla desarrollada por Fajar Siagian.
 
-## About The Project
+## Prerrequisitos
 
-![Screen Shot](screenshots/Ecommerce-Tailwind.png)
+Antes de comenzar, asegúrate de tener las siguientes herramientas instaladas:
 
-Ecommerce Tailwind project.
-
-## Screenshots
-<details>
-<summary>Homepage</summary>
-
-![Homepage](screenshots/Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Account</summary>
-
-![Account](screenshots/Account-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Checkout</summary>
-
-![checkout](screenshots/Checkout-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Login</summary>
-
-![Login](screenshots/Login-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Register</summary>
-
-![Register](screenshots/Register-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Shop</summary>
-
-![Shop](screenshots/Shop-Page-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Product</summary>
-
-![product](screenshots/Product-Ecommerce-Tailwind.png)
-</details>
-
-<details>
-<summary>Wishlist</summary>
-
-![wishlist](screenshots/Wishlist-Ecommerce-Tailwind.png)
-</details>
-
-## Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-
-* npm
+- **npm**  
+Para instalar la última versión de npm, ejecuta el siguiente comando:
 
 ```sh
 npm install npm@latest -g
 ```
 
-### Installation
+### Instalación
 
-1. Clone the repo
+1. Clonar el repositorio
 
 ```sh
 git clone https://github.com/ArianaGonzabay/Backend-LP.git
 ```
 
-2. Install NPM packages
+2. Instalar dependencias
+Entra en la carpeta del proyecto y ejecuta:
 
 ```sh
 npm install
 ```
 
-3. run npm run build
+3. Construir el proyecto
 
 ```sh
 npm run build
 ```
 
 
-## Authors
+## Autor de la plantilla base
+Este proyecto utiliza como base una plantilla desarrollada por:
 
 * **Fajar Siagian** - *Fullstack Developer* - [Fajar Siagian](https://github.com/fajar7xx/) - *author*
 
