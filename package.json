@@ -5,13 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "npx tailwindcss -i ./src/main.css -o ./public/assets/css/main.css -w"
+    "watch": "npx tailwindcss -i ./src/main.css -o ./public/assets/css/main.css -w",
+    "build": "npx tailwindcss -i ./src/main.css -o ./public/assets/css/main.css && lite-server"
   },
-  "keywords": [],
-  "author": "Fajar Siagian",
-  "license": "ISC",
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.0",
+    "lite-server": "^2.6.1",
     "tailwindcss": "^3.0.23"
   },
   "dependencies": {
