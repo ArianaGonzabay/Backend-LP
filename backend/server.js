@@ -33,7 +33,7 @@ app.get('/productos/:id', async (req, res) => {
 });
 
 
-app.post('/reseñas', async (req, res) => {
+app.post('/resenas', async (req, res) => {
   const { producto_id, usuario_id, comentario, calificacion } = req.body;
   if (!producto_id || !usuario_id || !calificacion) {
     return res.status(400).json({ error: 'Faltan datos obligatorios (producto_id, usuario_id, calificacion)' });
@@ -53,7 +53,7 @@ app.post('/reseñas', async (req, res) => {
     });
   } catch (error) {
     console.error('Error al crear la reseña:', error);
-    res.status(500).json({ error: 'Error al crear la reseña' });
+    res.status(500).json({ error: 'Error al crear la reseña', details: error.message });
   }
 });
 
