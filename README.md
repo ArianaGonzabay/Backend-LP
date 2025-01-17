@@ -1,9 +1,9 @@
 <br/>
 <p align="center">
-  <h3 align="center">Ecommerce Backend</h3>
+  <h3 align="center">Ecommerce Web</h3>
 
   <p align="center">
-    Backend para un ecommerce utilizando como base una plantilla de Tailwind CSS.
+    Web para un ecommerce utilizando como base una plantilla de Tailwind CSS.
     <br/>
     <br/>
   </p>
@@ -11,14 +11,14 @@
 
 ## Acerca del Proyecto
 
-Este proyecto corresponde al backend de un ecommerce, creado tomando como base la plantilla desarrollada por Fajar Siagian.
+Este proyecto corresponde a un sitio web de un ecommerce, creado tomando como base la plantilla desarrollada por Fajar Siagian.
 
 ## Prerrequisitos
 
 Antes de comenzar, asegúrate de tener las siguientes herramientas instaladas:
 
 - **npm**  
-Para instalar la última versión de npm, ejecuta el siguiente comando:
+Para instalar la última versión de npm, ejecuta el siguiente comando dentro de la carpeta frontend:
 
 ```sh
 npm install npm@latest -g
@@ -33,7 +33,7 @@ git clone https://github.com/ArianaGonzabay/Backend-LP.git
 ```
 
 2. Instalar dependencias
-Entra en la carpeta del proyecto y ejecuta:
+Entra en la carpeta frontend y ejecuta:
 
 ```sh
 npm install
