@@ -7,15 +7,24 @@ const Producto = sequelize.define('Producto', {
     allowNull: false,
   },
   descripcion: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   precio: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
   stock: {
     type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  categoria: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  fecha_vencimiento: {
+    type: DataTypes.DATE,
     allowNull: false,
   },
 });
