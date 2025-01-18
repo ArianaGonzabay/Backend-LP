@@ -52,6 +52,16 @@ CREATE TABLE reseñas (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+CREATE TABLE facturas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id INT,
+    fecha_emision TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10, 2),
+    metodo_pago VARCHAR(50),
+    direccion_envio VARCHAR(255),
+    estado VARCHAR(50) DEFAULT 'Pendiente',  -- 'Pendiente', 'Pagada', etc.
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id)
+);
 
 CREATE USER 'grupo4'@'localhost' IDENTIFIED BY 'password321';
 GRANT ALL PRIVILEGES ON tienda.* TO 'grupo4'@'localhost';
@@ -110,7 +120,18 @@ ALTER TABLE detalles_pedido
 ADD COLUMN createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
-select * from productos;
+ALTER TABLE facturas ADD COLUMN createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE facturas ADD COLUMN updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+/*select * from productos;
 SELECT * FROM productos WHERE id = 2;
+
+select * from pedidos;
+select * from detalles_pedido;
+
+select * from facturas;
+*/
+
 
 
