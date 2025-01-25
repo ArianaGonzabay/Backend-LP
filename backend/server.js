@@ -1,11 +1,15 @@
 const express = require('express');
 const app = express();
 const db = require('./config/db');
+const cors = require('cors');
+
 const Producto = require('./models/Producto');
 const Reseña = require('./models/Reseña');
 const Pedido = require('./models/Pedido');
 const DetallePedido = require('./models/DetallePedido');
 const Factura = require('./models/Factura');
+
+app.use(cors());
 
 app.use(express.json());
 
