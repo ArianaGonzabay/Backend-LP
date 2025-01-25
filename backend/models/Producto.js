@@ -27,6 +27,11 @@ const Producto = sequelize.define('Producto', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  imagen: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 module.exports = Producto;
+
