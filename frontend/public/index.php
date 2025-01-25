@@ -1,4 +1,32 @@
 <?php
+session_start();
+
+// Inicializa el carrito si no existe
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// Maneja la acción de agregar al carrito
+if (isset($_POST['add_to_cart'])) {
+    $product_id = $_POST['product_id'];
+    $product_name = $_POST['product_name'];
+    $product_price = $_POST['product_price'];
+    $product_image = $_POST['product_image'];
+
+    // Verifica si el producto ya está en el carrito
+    if (isset($_SESSION['cart'][$product_id])) {
+        $_SESSION['cart'][$product_id]['quantity']++;
+    } else {
+        $_SESSION['cart'][$product_id] = [
+            'name' => $product_name,
+            'price' => $product_price,
+            'image' => $product_image,
+            'quantity' => 1
+        ];
+    }
+}
+
+// Datos de los productos
 $title = "Catálogo de Productos";
 $companyName = "Marketly";
 $year = date("Y");
@@ -46,7 +74,7 @@ if ($json_data !== false) {
         <div class="container flex">
             <div class="flex items-center justify-between flex-grow md:pl-12 py-5">
                 <div class="flex items-center space-x-6 capitalize">
-                    <a href="#" class="text-gray-200 hover:text-white transition">Catálogo</a>
+                    <a href="index.php" class="text-gray-200 hover:text-white transition">Catálogo</a>
                     <a href="pages/cart.php" class="text-gray-200 hover:text-white transition">Carrito</a>
                 </div>
             </div>
@@ -54,8 +82,7 @@ if ($json_data !== false) {
     </nav>
 
     <!-- Shop Wrapper -->
-    <div
-        class="container mx-auto px-4 py-8 grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start justify-center">
+    <div class="container mx-auto px-4 py-8 grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start justify-center">
         <!-- Products -->
         <div class="col-span-4 md:col-span-3 px-4 py-6">
             <div class="grid md:grid-cols-3 grid-cols-2 gap-4 justify-items-center">
@@ -79,7 +106,7 @@ if ($json_data !== false) {
                                     </a>
                                 </div>
                             </div>
-                            <!--dirige a los detalles del producto-->
+                            <!-- Product Details -->
                             <div class="pt-4 pb-3 px-4 h-32">
                                 <a href="pages/product.php?id=<?= $product['id'] ?>">
                                     <h4 class="uppercase font-medium text-lg mb-2 text-gray-800 hover:text-primary transition">
@@ -87,14 +114,25 @@ if ($json_data !== false) {
                                     </h4>
                                 </a>
                                 <div class="flex items-baseline mb-1 space-x-2">
-                                    <p class="text-lg text-primary font-semibold">$<?= number_format($product['precio'], 2) ?>
-                                    </p>
+                                    <p class="text-lg text-primary font-semibold">$<?= number_format($product['precio'], 2) ?></p>
                                 </div>
                             </div>
 
-                            <a href="#"
-                                class="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Agregar
-                                a carrito</a>
+                            <!-- Add to Cart -->
+                            <form method="post" action="">
+                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                <input type="hidden" name="product_name" value="<?= $product['nombre'] ?>">
+                                <input type="hidden" name="product_price" value="<?= $product['precio'] ?>">
+                                <input type="hidden" name="product_image" value="<?= $product['imagen'] ?>">
+                                <button type="submit" name="add_to_cart"
+                                    style="background-color: rgb(253, 61, 87); color: white; border: 1px solid rgb(253, 61, 87); padding: 8px; border-radius: 5px; transition: all 0.3s ease-in-out;"
+                                    onmouseover="this.style.backgroundColor='white'; this.style.color='rgb(253, 61, 87)';"
+                                    onmouseout="this.style.backgroundColor='rgb(253, 61, 87)'; this.style.color='white';">
+                                    Agregar a carrito
+                                </button>
+                            </form>
+
+
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -103,10 +141,6 @@ if ($json_data !== false) {
             </div>
         </div>
     </div>
-
-
-
-
 
     <!-- Footer -->
     <div class="bg-gray-800 py-4">
