@@ -8,10 +8,46 @@ const Reseña = require('./models/Reseña');
 const Pedido = require('./models/Pedido');
 const DetallePedido = require('./models/DetallePedido');
 const Factura = require('./models/Factura');
+const Usuario = require('./models/Usuario');
 
 app.use(cors());
 
 app.use(express.json());
+
+//Crear Usuario
+app.post('/usuarios', async (req, res) => {
+  const { nombre, apellido, email, password } = req.body;
+  if (!nombre || !apellido || !email || !password) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios (nombre, apellido, email, password)' });
+  }
+  try {
+    const nuevoUsuario = await Usuario.create({
+      nombre,
+      apellido,
+      email,
+      password,
+    });
+
+    res.status(201).json({
+      message: 'Usuario creado exitosamente',
+      usuario: nuevoUsuario,
+    });
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({ error: 'Error al crear el usuario', details: error.message });
+  }
+});
+
+app.get('/usuarios', async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll();
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error al obtener los usuarios:', error);
+    res.status(500).json({ error: 'Error al obtener los usuarios', details: error.message });
+  }
+});
+
 
 // Endpoint: Obtener todos los productos
 app.get('/productos', async (req, res) => {
@@ -188,6 +224,8 @@ app.post('/carritos', async (req, res) => {
     res.status(500).json({ error: 'Error al agregar al carrito', details: error.message });
   }
 });
+
+
 
 
 const PORT = process.env.PORT || 3000;
