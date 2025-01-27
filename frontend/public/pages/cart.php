@@ -58,7 +58,7 @@ $total = 0;
     <!-- Header -->
     <header class="py-4 shadow-sm" style="background-color: #111827;">
         <div class="container flex items-center justify-center">
-            <a href="index.php" class="flex items-center gap-4">
+            <a href="../index.php" class="flex items-center gap-4">
                 <img src="../assets/images/marketly.png" alt="logo" class="h-12 mr-4">
                 <h2 class="text-3xl font-semibold text-white"><?= $site_name ?></h2>
             </a>
@@ -158,8 +158,8 @@ $total = 0;
                     <p>$<?= number_format($total, 2) ?></p>
                 </div>
 
-                <a href="#" class="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium">
-                    Proceed to Checkout
+                <a href="checkout.php" class="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium">
+                    Proceder a Pagar
                 </a>
             </div>
         </div>
