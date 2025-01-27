@@ -1,4 +1,7 @@
 <?php
+
+$site_name = "Marketly";
+
 session_start();
 
 // Inicializar carrito si no existe
@@ -40,9 +43,9 @@ $total = 0;
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart - Ecommerce Tailwind</title>
+    <title>Carrito</title>
 
-    <link rel="shortcut icon" href="../assets/images/favicon/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/images/marketly.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 
@@ -53,10 +56,11 @@ $total = 0;
 
 <body>
     <!-- Header -->
-    <header class="py-4 shadow-sm bg-white">
+    <header class="py-4 shadow-sm" style="background-color: #111827;">
         <div class="container flex items-center justify-center">
-            <a href="../index.php">
-                <h2 class="text-2xl font-bold text-gray-800">Marketly</h2>
+            <a href="index.php" class="flex items-center gap-4">
+                <img src="../assets/images/marketly.png" alt="logo" class="h-12 mr-4">
+                <h2 class="text-3xl font-semibold text-white"><?= $site_name ?></h2>
             </a>
         </div>
     </header>
@@ -75,7 +79,7 @@ $total = 0;
     <!-- ./Navbar -->
 
     <!-- Cart Wrapper -->
-    <div class="container grid grid-cols-12 items-start gap-6 pt-4 pb-16">
+    <div class="container grid grid-cols-12 items-start gap-6 pt-4 pb-16 mt-8">
         <!-- Cart -->
         <div class="col-span-9">
             <div class="space-y-4">

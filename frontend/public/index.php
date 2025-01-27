@@ -48,7 +48,7 @@ if ($json_data !== false) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?></title>
-    <link rel="shortcut icon" href="../assets/images/favicon/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/images/marketly.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,10 +61,11 @@ if ($json_data !== false) {
 
 <body>
     <!-- Header -->
-    <header class="py-4 shadow-sm bg-white">
+    <header class="py-4 shadow-sm" style="background-color: #111827;">
         <div class="container flex items-center justify-center">
-            <a href="index.php">
-                <h2 class="text-2xl font-bold text-gray-800"><?= $companyName ?></h2>
+            <a href="index.php" class="flex items-center">
+                <img src="../assets/images/marketly.png" alt="logo" class="h-12 mr-4">
+                <h2 class="text-3xl font-semibold text-white"><?= $companyName ?></h2>
             </a>
         </div>
     </header>
@@ -94,15 +95,10 @@ if ($json_data !== false) {
                                     class="w-full h-full object-cover">
                                 <div
                                     class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition">
-                                    <a href="#"
+                                    <a href="pages/product.php?id=<?= $product['id'] ?>"
                                         class="text-white text-lg w-9 h-8 rounded-full bg-primary flex items-center justify-center hover:bg-gray-800 transition"
                                         title="view product">
                                         <i class="fa-solid fa-magnifying-glass"></i>
-                                    </a>
-                                    <a href="#"
-                                        class="text-white text-lg w-9 h-8 rounded-full bg-primary flex items-center justify-center hover:bg-gray-800 transition"
-                                        title="add to wishlist">
-                                        <i class="fa-solid fa-heart"></i>
                                     </a>
                                 </div>
                             </div>
@@ -125,6 +121,7 @@ if ($json_data !== false) {
                                 <input type="hidden" name="product_price" value="<?= $product['precio'] ?>">
                                 <input type="hidden" name="product_image" value="<?= $product['imagen'] ?>">
                                 <button type="submit" name="add_to_cart"
+                                    class="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition"
                                     style="background-color: rgb(253, 61, 87); color: white; border: 1px solid rgb(253, 61, 87); padding: 8px; border-radius: 5px; transition: all 0.3s ease-in-out;"
                                     onmouseover="this.style.backgroundColor='white'; this.style.color='rgb(253, 61, 87)';"
                                     onmouseout="this.style.backgroundColor='rgb(253, 61, 87)'; this.style.color='white';">

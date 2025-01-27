@@ -21,7 +21,7 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title) ?></title>
-    <link rel="shortcut icon" href="../assets/images/favicon/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/images/marketly.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,10 +30,11 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
 </head>
 <body>
     <!-- Header -->
-    <header class="py-4 shadow-sm bg-white">
+    <header class="py-4 shadow-sm" style="background-color: #111827;">
         <div class="container flex items-center justify-center">
-            <a href="index.php">
-                <h2 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($site_name) ?></h2>
+            <a href="index.php" class="flex items-center gap-4">
+                <img src="../assets/images/marketly.png" alt="logo" class="h-12 mr-4">
+                <h2 class="text-3xl font-semibold text-white"><?= $site_name ?></h2>
             </a>
         </div>
     </header>
@@ -52,7 +53,7 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
 
     <!-- product-detail -->
     <?php if ($product): ?>
-    <div class="container grid grid-cols-2 gap-6 my-8">
+    <div class="container grid grid-cols-2 gap-6 my-8 mt-8">
     <div class="flex justify-center items-center">
         <img src="<?= htmlspecialchars($product['imagen']) ?>" alt="<?= htmlspecialchars($product['nombre']) ?>" class="w-1/2" style="width: 300px; height: 300px;">
     </div>
