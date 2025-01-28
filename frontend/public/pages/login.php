@@ -3,25 +3,21 @@ $title = "Ingreso";
 $site_name = "Marketly";
 $email = $password = "";
 $login_error = "";
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Obtener los datos del formulario
     $email = $_POST['email'];
     $password = $_POST['password'];
-
-    // URL de la API que devuelve los usuarios en formato JSON
-    $json_url = "http://localhost:3000/usuarios"; // Cambia la URL si es necesario
-    $json_data = @file_get_contents($json_url); // Usar @ para suprimir warnings si no se puede obtener los datos
-
-    // Verificar si los datos de la API fueron obtenidos correctamente
+   
+    $json_url = "http://localhost:3000/usuarios";
+    $json_data = @file_get_contents($json_url);
+    
     if ($json_data === false) {
         die('Error al obtener los usuarios');
     }
-
-    // Decodificar el JSON a un array asociativo
+    
     $usuarios = json_decode($json_data, true);
-
-    // Buscar el usuario con el correo ingresado
+    
     $usuarioEncontrado = null;
     foreach ($usuarios as $usuario) {
         if ($usuario['email'] === $email) {
@@ -29,15 +25,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             break;
         }
     }
-
-    // Verificar si el usuario fue encontrado y la contraseña es correcta
+    
     if ($usuarioEncontrado && $usuarioEncontrado['password'] === $password) {
-        // Redirigir al usuario a la página de inicio si las credenciales son correctas
-        header('Location: ../index.php');
+        $_SESSION['user_id'] = $usuarioEncontrado['id'];
+        $_SESSION['logged_in'] = true;
+        $_SESSION['email'] = $usuarioEncontrado['email'];
+        
+        if (isset($_SESSION['redirect_after_login']) && $_SESSION['redirect_after_login'] === 'checkout') {
+            unset($_SESSION['redirect_after_login']);
+            header('Location: checkout.php');
+        } else {
+            header('Location: ../index.php');
+        }
         exit();
     } else {
-        // Si las credenciales son incorrectas
-        echo "Correo o contraseña incorrectos.";
+        $login_error = "Correo o contraseña incorrectos.";
     }
 }
 ?>

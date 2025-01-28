@@ -11,14 +11,14 @@ if (!isset($_SESSION['cart'])) {
 
 // Manejar acciones del carrito
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_id = $_POST['product_id'];
-
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'increase':
+                $product_id = $_POST['product_id'];
                 $_SESSION['cart'][$product_id]['quantity']++;
                 break;
             case 'decrease':
+                $product_id = $_POST['product_id'];
                 if ($_SESSION['cart'][$product_id]['quantity'] > 1) {
                     $_SESSION['cart'][$product_id]['quantity']--;
                 } else {
@@ -26,11 +26,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
             case 'remove':
+                $product_id = $_POST['product_id'];
                 unset($_SESSION['cart'][$product_id]);
                 break;
+            case 'complete_purchase':
+                // Marcar la compra como completada en la sesión
+                $_SESSION['purchase_completed'] = true;
+
+                // Vaciar el carrito después de completar la compra (opcional)
+                $_SESSION['cart'] = [];
+                echo "<script>alert('¡Tu compra ha sido generada con éxito!'); window.location.href = '../index.php';</script>";
         }
     }
 }
+
 
 // Calcular el total general
 $total = 0;
@@ -96,7 +105,7 @@ $total = 0;
 
                             <div class="w-1/3">
                                 <h2 class="text-gray-800 text-xl font-medium uppercase"><?= htmlspecialchars($product['name']) ?></h2>
-                                <p class="text-gray-500 text-sm">Availability: <span class="text-green-600">In Stock</span></p>
+                                <p class="text-gray-500 text-sm">Disponibilidad: <span class="text-green-600">En stock</span></p>
                             </div>
                             <div>
                                 <form method="POST" action="">
@@ -130,7 +139,7 @@ $total = 0;
         <!-- Order Summary -->
         <div class="col-span-3">
             <div class="border border-gray-200 p-4 rounded">
-                <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">Order Summary</h4>
+                <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">Factura</h4>
                 <div class="space-y-2">
                     <?php foreach ($_SESSION['cart'] as $product): ?>
                         <div class="flex justify-between">
@@ -146,11 +155,6 @@ $total = 0;
                 <div class="flex justify-between border-b border-gray-200 text-gray-800 font-medium py-3 uppercase">
                     <p>Subtotal</p>
                     <p>$<?= number_format($total, 2) ?></p>
-                </div>
-
-                <div class="flex justify-between border-b border-gray-200 text-gray-800 font-medium py-3 uppercase">
-                    <p>Shipping</p>
-                    <p>Free</p>
                 </div>
 
                 <div class="flex justify-between text-gray-800 font-medium py-3 uppercase">

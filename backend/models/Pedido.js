@@ -18,6 +18,30 @@ const Pedido = sequelize.define('Pedido', {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
+    telefono: {
+        type: DataTypes.STRING(15),
+        allowNull: false,
+    },
+    card_name: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+    },
+    card_number: {
+        type: DataTypes.STRING(19),
+        allowNull: false,
+    },
+    expiry_date: {
+        type: DataTypes.STRING(7),
+        allowNull: false,
+    },
+    cvv: {
+        type: DataTypes.STRING(4),
+        allowNull: false,
+    },
+    tipo_tarjeta: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+    },
 }, {
     timestamps: true,
 });

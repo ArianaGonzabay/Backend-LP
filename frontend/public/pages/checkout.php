@@ -1,10 +1,101 @@
 <?php
 $title = "Detalles del Producto";
 $site_name = "Marketly";
+
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$user_data = [];
+$json_url = 'http://localhost:3000/usuarios/' . $_SESSION['user_id'];
+
+try {
+    $json_data = file_get_contents($json_url);
+
+    if ($json_data !== false) {
+        $user_data = json_decode($json_data, true);
+        error_log("Datos del usuario obtenidos: " . print_r($user_data, true));
+    }
+} catch (Exception $e) {
+    error_log("Error: " . $e->getMessage());
+}
+
+// Calcular el total general
+$total = 0;
+if (!empty($_SESSION['cart'])):
+    foreach ($_SESSION['cart'] as $product_id => $product):
+        $total += $product['price'] * $product['quantity'];
+    endforeach;
+endif;
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $telefono = $_POST['phone'] ?? '';
+    $direccion = $_POST['address'] ?? '';
+    $ciudad = $_POST['city'] ?? '';
+    $pais = $_POST['region'] ?? '';
+    $card_name = $_POST['card-name'] ?? '';
+    $card_number = $_POST['card-number'] ?? '';
+    $expiry_date = $_POST['expiry-date'] ?? '';
+    $cvv = $_POST['cvv'] ?? '';
+
+    if (empty($telefono) || empty($direccion) || empty($ciudad) || empty($pais)) {
+        $error = "Todos los campos son obligatorios";
+        error_log("Error de validación: " . $error);
+    } else {
+        $productos = [];
+
+        if (!empty($_SESSION['cart'])):
+            foreach ($_SESSION['cart'] as $product_id => $product) {
+
+                $productos[] = [
+                    'producto_id' => $product_id,
+                    'cantidad' => $product['quantity']
+                ];
+            }
+        endif;
+
+        // arreglo para POST
+        $data = [
+            'usuario_id' => intval($_SESSION['user_id']),
+            'total' => number_format($total, 2, '.', ''),
+            'metodo_pago' => 'Tarjeta de Crédito',
+            'direccion_envio' => "$direccion, $ciudad, $pais",
+            'telefono' => $telefono,
+            'card_name' => $card_name,
+            'card_number' => $card_number,
+            'expiry_date' => $expiry_date,
+            'cvv' => $cvv,
+            'tipo_tarjeta' => $_POST['card-type'],
+            'productos' => $productos // Agregar los productos del carrito
+        ];
+
+        // Enviar los datos
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-type: application/json',
+                'content' => json_encode($data)
+            ]
+        ];
+        $context = stream_context_create($options);
+        $response = file_get_contents('http://localhost:3000/pedidos', false, $context);
+
+        //vaciar el carrito
+        $_SESSION['cart'] = [];
+        $total = 0;
+        echo "<script>alert('¡Tu compra ha sido generada con éxito!'); window.location.href = '../index.php';</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +105,11 @@ $site_name = "Marketly";
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="py-4 shadow-sm" style="background-color: #111827;">
@@ -41,131 +135,129 @@ $site_name = "Marketly";
 
     <!-- wrapper -->
     <div class="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
-
         <div class="col-span-8 border border-gray-200 p-4 rounded">
-            <h3 class="text-lg font-medium capitalize mb-4">Checkout</h3>
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+            <h3 class="text-lg font-medium capitalize mb-4">Datos</h3>
+
+            <?php if (isset($error)): ?>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+            <form method="POST" id="checkout-form" class="space-y-4">
+                <div class="space-y-4">
+                    <!-- Datos Personales -->
                     <div>
-                        <label for="first-name" class="text-gray-600">First Name <span
-                                class="text-primary">*</span></label>
-                        <input type="text" name="first-name" id="first-name" class="input-box">
+                        <label for="nombre" class="text-gray-600">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" class="input-box bg-gray-100"
+                            value="<?php echo isset($user_data['nombre']) ? htmlspecialchars($user_data['nombre']) : ''; ?>"
+                            readonly>
                     </div>
                     <div>
-                        <label for="last-name" class="text-gray-600">Last Name <span
+                        <label for="apellido" class="text-gray-600">Apellido</label>
+                        <input type="text" name="apellido" id="apellido" class="input-box bg-gray-100"
+                            value="<?php echo isset($user_data['apellido']) ? htmlspecialchars($user_data['apellido']) : ''; ?>"
+                            readonly>
+                    </div>
+                    <div>
+                        <label for="email" class="text-gray-600">Email</label>
+                        <input type="email" name="email" id="email" class="input-box bg-gray-100"
+                            value="<?php echo isset($user_data['email']) ? htmlspecialchars($user_data['email']) : ''; ?>"
+                            readonly>
+                    </div>
+                    <div>
+                        <label for="phone" class="text-gray-600">Teléfono <span class="text-primary">*</span></label>
+                        <input type="text" name="phone" id="phone" class="input-box" required>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div>
+                        <label for="region" class="text-gray-600">País <span class="text-primary">*</span></label>
+                        <input type="text" name="region" id="region" class="input-box" required>
+                    </div>
+                    <div>
+                        <label for="address" class="text-gray-600">Dirección <span class="text-primary">*</span></label>
+                        <input type="text" name="address" id="address" class="input-box" required>
+                    </div>
+                    <div>
+                        <label for="city" class="text-gray-600">Ciudad <span class="text-primary">*</span></label>
+                        <input type="text" name="city" id="city" class="input-box" required>
+                    </div>
+
+                    <!-- Datos de Tarjeta -->
+                    <div>
+                        <label for="card-type" class="text-gray-600">Tipo de Tarjeta <span
                                 class="text-primary">*</span></label>
-                        <input type="text" name="last-name" id="last-name" class="input-box">
+                        <select name="card-type" id="card-type" class="input-box" required>
+                            <option value="credito">Crédito</option>
+                            <option value="debito">Débito</option>
+                        </select>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-lg font-medium capitalize mb-4">Datos de la Tarjeta</h3>
+                        <div>
+                            <label for="card-name" class="text-gray-600">Nombre del Titular <span
+                                    class="text-primary">*</span></label>
+                            <input type="text" name="card-name" id="card-name" class="input-box" required>
+                        </div>
+                        <div>
+                            <label for="card-number" class="text-gray-600">Número de Tarjeta <span
+                                    class="text-primary">*</span></label>
+                            <input type="text" name="card-number" id="card-number" class="input-box" maxlength="16"
+                                required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="expiry-date" class="text-gray-600">Fecha de Expiración <span
+                                        class="text-primary">*</span></label>
+                                <input type="text" name="expiry-date" id="expiry-date" class="input-box"
+                                    placeholder="MM/AA" required>
+                            </div>
+                            <div>
+                                <label for="cvv" class="text-gray-600">CVV <span class="text-primary">*</span></label>
+                                <input type="text" name="cvv" id="cvv" class="input-box" maxlength="4" required>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label for="company" class="text-gray-600">Company</label>
-                    <input type="text" name="company" id="company" class="input-box">
-                </div>
-                <div>
-                    <label for="region" class="text-gray-600">Country/Region</label>
-                    <input type="text" name="region" id="region" class="input-box">
-                </div>
-                <div>
-                    <label for="address" class="text-gray-600">Street address</label>
-                    <input type="text" name="address" id="address" class="input-box">
-                </div>
-                <div>
-                    <label for="city" class="text-gray-600">City</label>
-                    <input type="text" name="city" id="city" class="input-box">
-                </div>
-                <div>
-                    <label for="phone" class="text-gray-600">Phone number</label>
-                    <input type="text" name="phone" id="phone" class="input-box">
-                </div>
-                <div>
-                    <label for="email" class="text-gray-600">Email address</label>
-                    <input type="email" name="email" id="email" class="input-box">
-                </div>
-                <div>
-                    <label for="company" class="text-gray-600">Company</label>
-                    <input type="text" name="company" id="company" class="input-box">
-                </div>
-            </div>
+            
 
         </div>
-
-        <div class="col-span-4 border border-gray-200 p-4 rounded">
-            <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">order summary</h4>
-            <div class="space-y-2">
-                <div class="flex justify-between">
-                    <div>
-                        <h5 class="text-gray-800 font-medium">Italian shape sofa</h5>
-                        <p class="text-sm text-gray-600">Size: M</p>
-                    </div>
-                    <p class="text-gray-600">
-                        x3
-                    </p>
-                    <p class="text-gray-800 font-medium">$320</p>
+        <!-- Factura-->
+        <div class="col-span-4">
+            <div class="border border-gray-200 p-4 rounded sticky top-4">
+                <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">Factura</h4>
+                <div class="space-y-2">
+                    <?php foreach ($_SESSION['cart'] as $product): ?>
+                        <div class="flex justify-between">
+                            <div>
+                                <h5 class="text-gray-800 font-medium"><?= htmlspecialchars($product['name']) ?></h5>
+                            </div>
+                            <p class="text-gray-600">x<?= $product['quantity'] ?></p>
+                            <p class="text-gray-800 font-medium">
+                                $<?= number_format($product['price'] * $product['quantity'], 2) ?></p>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div class="flex justify-between">
-                    <div>
-                        <h5 class="text-gray-800 font-medium">Italian shape sofa</h5>
-                        <p class="text-sm text-gray-600">Size: M</p>
-                    </div>
-                    <p class="text-gray-600">
-                        x3
-                    </p>
-                    <p class="text-gray-800 font-medium">$320</p>
+
+                <div class="flex justify-between border-b border-gray-200 text-gray-800 font-medium py-3 uppercase">
+                    <p>Subtotal</p>
+                    <p>$<?= number_format($total, 2) ?></p>
                 </div>
-                <div class="flex justify-between">
-                    <div>
-                        <h5 class="text-gray-800 font-medium">Italian shape sofa</h5>
-                        <p class="text-sm text-gray-600">Size: M</p>
-                    </div>
-                    <p class="text-gray-600">
-                        x3
-                    </p>
-                    <p class="text-gray-800 font-medium">$320</p>
+
+                <div class="flex justify-between text-gray-800 font-medium py-3 uppercase">
+                    <p class="font-semibold">Total</p>
+                    <p>$<?= number_format($total, 2) ?></p>
                 </div>
-                <div class="flex justify-between">
-                    <div>
-                        <h5 class="text-gray-800 font-medium">Italian shape sofa</h5>
-                        <p class="text-sm text-gray-600">Size: M</p>
-                    </div>
-                    <p class="text-gray-600">
-                        x3
-                    </p>
-                    <p class="text-gray-800 font-medium">$320</p>
-                </div>
+                <button type="submit"
+                    class="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium">
+                    Proceder a Pagar
+                </button>
             </div>
-
-            <div class="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-                <p>subtotal</p>
-                <p>$1280</p>
-            </div>
-
-            <div class="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-                <p>shipping</p>
-                <p>Free</p>
-            </div>
-
-            <div class="flex justify-between text-gray-800 font-medium py-3 uppercas">
-                <p class="font-semibold">Total</p>
-                <p>$1280</p>
-            </div>
-
-            <div class="flex items-center mb-4 mt-2">
-                <input type="checkbox" name="aggrement" id="aggrement"
-                    class="text-primary focus:ring-0 rounded-sm cursor-pointer w-3 h-3">
-                <label for="aggrement" class="text-gray-600 ml-3 cursor-pointer text-sm">I agree to the <a href="#"
-                        class="text-primary">terms & conditions</a></label>
-            </div>
-
-            <a href="#"
-                class="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium">Place
-                order</a>
         </div>
-
     </div>
-    <!-- ./wrapper -->
-
-     <!-- Footer -->
-     <div class="bg-gray-800 py-4">
+    </form>
+    <!-- Footer -->
+    <div class="bg-gray-800 py-4">
         <div class="container flex items-center justify-between">
             <p class="text-white">&copy; Marketly - All Right Reserved</p>
             <div>
@@ -174,4 +266,5 @@ $site_name = "Marketly";
         </div>
     </div>
 </body>
+
 </html>

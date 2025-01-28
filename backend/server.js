@@ -48,6 +48,20 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 
+//usuario por id
+app.get('/usuarios/:id', async (req, res) => {
+  try {
+    const usuario = await Usuario.findByPk(req.params.id);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    res.json(usuario);
+  } catch (error) {
+    console.error('Error al obtener el usuario:', error);
+    res.status(500).json({ error: 'Error al obtener el usuario', details: error.message });
+  }
+});
+
 
 // Endpoint: Obtener todos los productos
 app.get('/productos', async (req, res) => {
@@ -102,40 +116,57 @@ app.post('/resenas', async (req, res) => {
 
 //Generar Compra
 app.post('/pedidos', async (req, res) => {
-  const { usuario_id, metodo_pago, direccion_envio, productos } = req.body;
+  const { 
+    usuario_id, 
+    metodo_pago, 
+    direccion_envio, 
+    productos, 
+    telefono, 
+    card_name, 
+    card_number, 
+    expiry_date, 
+    cvv, 
+    tipo_tarjeta 
+  } = req.body;
 
-  if (!usuario_id || !metodo_pago || !direccion_envio || !productos || productos.length === 0) {
-    return res.status(400).json({ error: 'Faltan datos obligatorios (usuario_id, metodo_pago, direccion_envio, productos)' });
+  if (!usuario_id || !metodo_pago || !direccion_envio || !productos || productos.length === 0 || 
+      !telefono || !card_name || !card_number || !expiry_date || !cvv || !tipo_tarjeta) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios (usuario_id, metodo_pago, direccion_envio, productos, telefono, card_name, card_number, expiry_date, cvv, tipo_tarjeta)' });
   }
 
-  try{
-    //Total del pedido
+  try {
+    // Calcular el total del pedido
     let total = 0;
-    for(let i=0; i<productos.length; i++){
+    for (let i = 0; i < productos.length; i++) {
       const producto = await Producto.findByPk(productos[i].producto_id);
-      if(producto) {
+      if (producto) {
         total += producto.precio * productos[i].cantidad;
       }
     }
 
-    //crear pedido
+    // Crear el pedido
     const nuevoPedido = await Pedido.create({
       usuario_id,
       metodo_pago,
       direccion_envio,
+      telefono,
+      card_name,
+      card_number,
+      expiry_date,
+      cvv,
+      tipo_tarjeta,
       total,
     });
 
-    //crear los detalles del pedido
-    for (let i=0; i<productos.length; i++){
+    // Crear los detalles del pedido
+    for (let i = 0; i < productos.length; i++) {
       await DetallePedido.create({
-        pedido_id: nuevoPedido.id,
+        pedido_id: nuevoPedido.id, 
         producto_id: productos[i].producto_id,
         cantidad: productos[i].cantidad,
       });
     }
 
-    //generar la factura
     const factura = await generarFactura(nuevoPedido);
 
     res.status(201).json({
@@ -147,6 +178,36 @@ app.post('/pedidos', async (req, res) => {
   } catch (error) {
     console.error("Error al generar el pedido: ", error);
     res.status(500).json({ error: 'Error al generar el pedido o la factura', details: error.message });
+  }
+});
+
+
+//ver pedidos
+app.get('/pedidos', async (req, res) => {
+  try {
+    const pedidos = await Pedido.findAll();
+    res.json(pedidos);
+  } catch (error) {
+    console.error('Error al obtener los pedidos:', error);
+    res.status(500).json({ error: 'Error al obtener los pedidos', details: error.message });
+  }
+});
+
+//ver pedido por id
+app.get('/pedidos/:id', async (req, res) => {
+  const pedidoId = req.params.id;
+
+  try {
+    const pedido = await Pedido.findByPk(pedidoId);
+
+    if (pedido) {
+      res.json(pedido);
+    } else {
+      res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al obtener el pedido:', error);
+    res.status(500).json({ error: 'Error al obtener el pedido o los detalles', details: error.message });
   }
 });
 

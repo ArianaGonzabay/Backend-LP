@@ -32,7 +32,7 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
     <!-- Header -->
     <header class="py-4 shadow-sm" style="background-color: #111827;">
         <div class="container flex items-center justify-center">
-            <a href="index.php" class="flex items-center gap-4">
+            <a href="../index.php" class="flex items-center gap-4">
                 <img src="../assets/images/marketly.png" alt="logo" class="h-12 mr-4">
                 <h2 class="text-3xl font-semibold text-white"><?= $site_name ?></h2>
             </a>

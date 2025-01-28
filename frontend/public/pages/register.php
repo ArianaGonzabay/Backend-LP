@@ -12,9 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($nombre) || empty($apellido) || empty($email) || empty($password)) {
         echo "Todos los campos son obligatorios.";
     } else {
-        // Los datos están completos, ahora realizamos el POST al backend
 
-        // Crear el array con los datos del usuario
+        // datos del usuario
         $data = [
             'nombre' => $nombre,
             'apellido' => $apellido,
@@ -22,10 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'password' => $password
         ];
 
-        // Convertimos los datos en formato JSON
         $json_data = json_encode($data);
 
-        // Definimos las opciones para el contexto HTTP
         $options = [
             'http' => [
                 'method' => 'POST',
@@ -34,27 +31,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]
         ];
 
-        // Creamos el contexto de flujo
         $context = stream_context_create($options);
-
-        // URL de la API
         $url = 'http://localhost:3000/usuarios';
-
-        // Hacemos la solicitud POST
+        // solicitud POST
         $result = file_get_contents($url, false, $context);
 
-        // Verificamos si la solicitud fue exitosa
         if ($result === FALSE) {
             echo "Error al crear el usuario.";
         } else {
-            // Convertimos la respuesta JSON en un array asociativo
             $response = json_decode($result, true);
-            
-            // Verificamos el mensaje de éxito
             if (isset($response['message']) && $response['message'] == 'Usuario creado exitosamente') {
-                // Redirigir antes de enviar cualquier salida
                 header("Location: login.php");
-                exit;  // Asegura que no se ejecute más código después de la redirección
+                exit;
             } else {
                 echo "Hubo un problema al crear el usuario.";
             }
