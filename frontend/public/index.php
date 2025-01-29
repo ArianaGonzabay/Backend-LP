@@ -77,6 +77,7 @@ if ($json_data !== false) {
                 <div class="flex items-center space-x-6 capitalize">
                     <a href="index.php" class="text-gray-200 hover:text-white transition">Catálogo</a>
                     <a href="pages/cart.php" class="text-gray-200 hover:text-white transition">Carrito</a>
+                    
                 </div>
             </div>
         </div>

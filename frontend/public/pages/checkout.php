@@ -128,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="flex items-center space-x-6 capitalize">
                     <a href="../index.php" class="text-gray-200 hover:text-white transition">Catálogo</a>
                     <a href="cart.php" class="text-gray-200 hover:text-white transition">Carrito</a>
+                    
                 </div>
             </div>
         </div>
