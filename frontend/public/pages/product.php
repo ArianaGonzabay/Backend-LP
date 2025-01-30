@@ -1,6 +1,16 @@
 <?php
 session_start();
 
+// Verificar si el usuario ha iniciado sesión
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header('Location: login.php');
+    exit();
+}
+
+// Obtener el ID del usuario autenticado
+$user_id = $_SESSION['user_id'];
+
+
 // Inicializa el carrito si no existe
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -43,7 +53,7 @@ if ($json_data !== false) {
     $product = null;
 }
 
-$reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
+$reviews = $product && isset($product['reseñas']) ? $product['reseñas'] : [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -57,7 +67,9 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -88,7 +100,8 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
     <?php if ($product): ?>
         <div class="container grid grid-cols-2 gap-6 my-8 mt-8">
             <div class="flex justify-center items-center">
-                <img src="<?= htmlspecialchars($product['imagen']) ?>" alt="<?= htmlspecialchars($product['nombre']) ?>" class="w-1/2" style="width: 300px; height: 300px;">
+                <img src="<?= htmlspecialchars($product['imagen']) ?>" alt="<?= htmlspecialchars($product['nombre']) ?>"
+                    class="w-1/2" style="width: 300px; height: 300px;">
             </div>
 
             <div>
@@ -106,11 +119,13 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
                 <div class="space-y-2">
                     <p class="text-gray-800 font-semibold space-x-2">
                         <span>Disponibilidad: </span>
-                        <span class="text-green-600"><?= isset($product['stock']) && $product['stock'] > 0 ? 'En Stock' : 'Agotado' ?></span>
+                        <span
+                            class="text-green-600"><?= isset($product['stock']) && $product['stock'] > 0 ? 'En Stock' : 'Agotado' ?></span>
                     </p>
                     <p class="space-x-2">
                         <span class="text-gray-800 font-semibold">Categoría: </span>
-                        <span class="text-gray-600"><?= htmlspecialchars($product['categoria'] ?? 'No especificado') ?></span>
+                        <span
+                            class="text-gray-600"><?= htmlspecialchars($product['categoria'] ?? 'No especificado') ?></span>
                     </p>
                     <p class="space-x-2">
                         <span class="text-gray-800 font-semibold">ID: </span>
@@ -157,12 +172,14 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
                             </div>
                             <div class="ml-4 flex-grow">
                                 <div class="flex items-center mb-2">
-                                    <h5 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($review['nombre'] ?? 'Usuario Anónimo') ?></h5>
-                                    <span class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($review['fecha'] ?? 'Fecha no disponible') ?></span>
+                                    <h5 class="text-lg font-semibold text-gray-800">
+                                        <?= htmlspecialchars($review['usuario_id'] ?? 'Usuario Anónimo') ?></h5>
+                                    <span
+                                        class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($review['fecha'] ?? 'Fecha no disponible') ?></span>
                                 </div>
                                 <div class="flex gap-1 text-sm text-yellow-400 mb-2">
                                     <?php
-                                    $review_rating = $review['rating'] ?? 0;
+                                    $review_rating = $review['calificacion'] ?? 0;
                                     for ($i = 0; $i < $review_rating; $i++): ?>
                                         <span><i class="fa-solid fa-star"></i></span>
                                     <?php endfor; ?>
@@ -179,6 +196,52 @@ $reviews = $product && isset($product['reviews']) ? $product['reviews'] : [];
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Add Review Form -->
+        <div class="contenedor">
+            <h3 class="text-xl font-semibold mb-4">Agregar una Reseña</h3>
+            <form action="http://localhost:3000/resenas" method="POST" class="space-y-4">
+                <!-- Campo producto_id -->
+                <input type="hidden" name="producto_id" value="<?= htmlspecialchars($product_id) ?>">
+
+                <!-- Campo usuario_id -->
+                <input type="hidden" name="usuario_id" value="<?= htmlspecialchars($user_id) ?>">
+                <!-- Asegúrate de que $user_id contiene el ID del usuario autenticado -->
+
+                <!-- Campo para el comentario -->
+                <div>
+                    <label for="comentario" class="block text-gray-700">Comentario</label>
+                    <textarea id="comentario" name="comentario" rows="4"
+                        class="border border-gray-300 rounded w-full py-2 px-4" required></textarea>
+                </div>
+
+                <!-- Campo para la calificación -->
+                <div>
+                    <label for="calificacion" class="block text-gray-700">Puntuación</label>
+                    <select id="calificacion" name="calificacion" class="border border-gray-300 rounded w-full py-2 px-4"
+                        required>
+                        <option value="">Seleccione una puntuación</option>
+                        <option value="1">1 - Muy Malo</option>
+                        <option value="2">2 - Malo</option>
+                        <option value="3">3 - Regular</option>
+                        <option value="4">4 - Bueno</option>
+                        <option value="5">5 - Excelente</option>
+                    </select>
+                </div>
+
+                <!-- Botón para enviar -->
+                <div>
+                    <button type="submit"
+                        class="bg-primary text-white py-2 px-4 rounded hover:bg-transparent hover:text-primary transition">
+                        Enviar Reseña
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+
+
     <?php else: ?>
         <div class="container my-8">
             <p class="text-center text-gray-600">Producto no encontrado</p>

@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const Reseña = require('./Reseña');
 
 const Producto = sequelize.define('Producto', {
   nombre: {
@@ -31,6 +32,17 @@ const Producto = sequelize.define('Producto', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+});
+
+// Relación entre Producto y Reseña
+Producto.hasMany(Reseña, {
+  foreignKey: 'producto_id',
+  as: 'reseñas'
+});
+
+Reseña.belongsTo(Producto, {
+  foreignKey: 'producto_id',
+  as: 'producto'
 });
 
 module.exports = Producto;

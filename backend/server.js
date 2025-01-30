@@ -66,7 +66,12 @@ app.get('/usuarios/:id', async (req, res) => {
 // Endpoint: Obtener todos los productos
 app.get('/productos', async (req, res) => {
   try {
-    const productos = await Producto.findAll();
+    const productos = await Producto.findAll({
+      include: [{
+        model: Reseña,
+        as: 'reseñas'
+      }]
+    });
     res.json(productos);
   } catch (error) {
     console.error('Error al obtener los productos:', error);
@@ -75,13 +80,20 @@ app.get('/productos', async (req, res) => {
 });
 
 
-//Detalles de Productos
+// Detalles de Producto
 app.get('/productos/:id', async (req, res) => {
   try {
-    const producto = await Producto.findByPk(req.params.id);
+    const producto = await Producto.findByPk(req.params.id, {
+      include: [{
+        model: Reseña,
+        as: 'reseñas',
+      }]
+    });
+
     if (!producto) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
+
     res.json(producto);
   } catch (error) {
     console.error('Error al obtener el producto:', error);
@@ -111,6 +123,30 @@ app.post('/resenas', async (req, res) => {
   } catch (error) {
     console.error('Error al crear la reseña:', error);
     res.status(500).json({ error: 'Error al crear la reseña', details: error.message });
+  }
+});
+
+app.get('/resenas', async (req, res) => {
+  try {
+    const reseñas = await Reseña.findAll();
+    res.json(reseñas);
+  } catch (error) {
+    console.error('Error al obtener las reseñas:', error);
+    res.status(500).json({ error: 'Error al obtener las reseñas', details: error.message });
+  }
+});
+
+//Reseña por id
+app.get('/resenas/:id', async (req, res) => {
+  try {
+    const reseña = await Reseña.findByPk(req.params.id);
+    if (!reseña) {
+      return res.status(404).json({ error: 'Reseña no encontrada' });
+    }
+    res.json(reseña);
+  } catch (error) {
+    console.error('Error al obtener la reseña:', error);
+    res.status(500).json({ error: 'Error al obtener la reseña', details: error.message });
   }
 });
 
@@ -287,8 +323,6 @@ app.post('/carritos', async (req, res) => {
 });
 
 
-
-
 const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {
   res.send('Servidor corriendo!');
@@ -297,3 +331,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
