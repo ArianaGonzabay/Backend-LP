@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $product_price = $_POST['product_price'];
     $product_image = $_POST['product_image'];
 
+
     // Verifica si el producto ya está en el carrito
     if (isset($_SESSION['cart'][$product_id])) {
         $_SESSION['cart'][$product_id]['quantity']++;
@@ -37,6 +38,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     // Redirige para evitar reenvío de formularios
     header("Location: cart.php");
     exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['calificacion'])) {
+    // Procesar el formulario de reseñas
+    $product_id = $_POST['product_id'];
+    $user_id = $_POST['user_id'];
+    $rating = $_POST['calificacion'];
+    $comment = $_POST['comentario'];
+
+    // Realizar la petición POST al servidor API
+    $url = 'http://localhost:3000/resenas';
+    $data = [
+        'producto_id' => $product_id,
+        'usuario_id' => $user_id,
+        'calificacion' => $rating,
+        'comentario' => $comment
+    ];
+
+    $options = [
+        'http' => [
+            'method' => 'POST',
+            'header' => 'Content-Type: application/json',
+            'content' => json_encode($data)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+
+    if ($result === false) {
+        die('Error al enviar la reseña');
+    }
+
+    // Redirigir a la misma página para evitar reenvío del formulario
+    header("Location: product.php?id={$product_id}");
+    exit;
+
 }
 
 $title = "Detalles del Producto";
@@ -109,7 +147,20 @@ $reviews = $product && isset($product['reseñas']) ? $product['reseñas'] : [];
                 <div class="flex items-center mb-4">
                     <div class="flex gap-1 text-sm text-yellow-400">
                         <?php
-                        $rating = isset($product['rating']) ? $product['rating'] : 0;
+                        // Calcular el promedio de las calificaciones
+                        $total_rating = 0;
+                        $num_reviews = count($reviews);
+
+                        if ($num_reviews > 0) {
+                            foreach ($reviews as $review) {
+                                $total_rating += $review['calificacion'] ?? 0;
+                            }
+                            $rating = $total_rating / $num_reviews;
+                        } else {
+                            $rating = 0;
+                        }
+
+                        // Mostrar las estrellas
                         for ($i = 0; $i < 5; $i++): ?>
                             <span><i class="fa-<?= $i < $rating ? 'solid' : 'regular' ?> fa-star"></i></span>
                         <?php endfor; ?>
@@ -168,14 +219,21 @@ $reviews = $product && isset($product['reseñas']) ? $product['reseñas'] : [];
                     <?php foreach ($reviews as $review): ?>
                         <div class="flex items-start border-b border-gray-200 pb-8">
                             <div class="flex-shrink-0">
-                                <img src="/api/placeholder/40/40" class="rounded-full" alt="user avatar">
+                                <img src="https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+                                    class="rounded-full" alt="user avatar" style="width: 50px; height: 50px;">
                             </div>
                             <div class="ml-4 flex-grow">
                                 <div class="flex items-center mb-2">
                                     <h5 class="text-lg font-semibold text-gray-800">
-                                        <?= htmlspecialchars($review['usuario_id'] ?? 'Usuario Anónimo') ?></h5>
-                                    <span
-                                        class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($review['fecha'] ?? 'Fecha no disponible') ?></span>
+                                        <?= htmlspecialchars("Usuario ID: " . ($review['usuario_id'] ?? 'Usuario Anónimo')) ?>
+                                    </h5>
+                                    <span class="ml-4 text-sm text-gray-500">
+                                        <?php
+                                        $fecha = new DateTime($review['fecha'] ?? 'now', new DateTimeZone('UTC'));
+                                        $fecha->setTimezone(new DateTimeZone('America/Guayaquil'));
+                                        echo htmlspecialchars($fecha->format('d/m/Y H:i'));
+                                        ?>
+                                    </span>
                                 </div>
                                 <div class="flex gap-1 text-sm text-yellow-400 mb-2">
                                     <?php
@@ -200,14 +258,10 @@ $reviews = $product && isset($product['reseñas']) ? $product['reseñas'] : [];
         <!-- Add Review Form -->
         <div class="contenedor">
             <h3 class="text-xl font-semibold mb-4">Agregar una Reseña</h3>
-            <form action="http://localhost:3000/resenas" method="POST" class="space-y-4">
-                <!-- Campo producto_id -->
-                <input type="hidden" name="producto_id" value="<?= htmlspecialchars($product_id) ?>">
-
-                <!-- Campo usuario_id -->
-                <input type="hidden" name="usuario_id" value="<?= htmlspecialchars($user_id) ?>">
-                <!-- Asegúrate de que $user_id contiene el ID del usuario autenticado -->
-
+            <form action="product.php" method="POST" class="space-y-4">
+                <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                <!-- ID del producto -->
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
                 <!-- Campo para el comentario -->
                 <div>
                     <label for="comentario" class="block text-gray-700">Comentario</label>
